@@ -5,7 +5,7 @@ def pullOutDuplicates(inF, outF, distance):
 	#This is intended to open a file of Duplications from processed SyRI VCF files
 
 	outFirst = outF.rstrip().split(".")[0] + "_DuplicatedFeatures.vcf"
-	outSecond = outF.rstrip().split(".")[0] + "_NoDuplicates.vcf"
+	outSecond = outF.rstrip().split(".")[0] + "_NoOverlap.vcf"
 
 	with open(inF) as inputFile:
 		with open(outFirst, "w") as outputFile1:
