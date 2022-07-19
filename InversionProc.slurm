@@ -20,16 +20,16 @@ awk -F "\t" '$3 ~ /ID/ || $3 ~ /INVDPAL/  || $3 ~ /INVAL/' syri_uncorrected_pi22
 awk -F "\t" '$3 ~ /ID/ || $3 ~ /INVDPAL/  || $3 ~ /INVAL/' syri_uncorrected_pi297155.vcf > pi297155.vcf
 
 #This adds back in the header and adds in columns to count alleles present in each strain
-python3 InversionColumns.py pi300119.vcf 300119
-python3 InversionColumns.py pi329311.vcf 329311
-python3 InversionColumns.py pi506069.vcf 506069
-python3 InversionColumns.py pi510757.vcf 510757
-python3 InversionColumns.py pi655972.vcf 655972
-python3 InversionColumns.py CA.vcf CA
-python3 InversionColumns.py leoti.vcf leoti
-python3 InversionColumns.py rio.vcf rio
-python3 InversionColumns.py pi229841.vcf 229841
-python3 InversionColumns.py pi297155.vcf 297155
+python3 AddColumns.py pi300119.vcf 300119
+python3 AddColumns.py pi329311.vcf 329311
+python3 AddColumns.py pi506069.vcf 506069
+python3 AddColumns.py pi510757.vcf 510757
+python3 AddColumns.py pi655972.vcf 655972
+python3 AddColumns.py CA.vcf CA
+python3 AddColumns.py leoti.vcf leoti
+python3 AddColumns.py rio.vcf rio
+python3 AddColumns.py pi229841.vcf 229841
+python3 AddColumns.py pi297155.vcf 297155
 
 #This prepares above files to be merged using bcftools
 module load samtools
