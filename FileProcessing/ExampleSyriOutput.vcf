@@ -1,0 +1,45 @@
+##fileformat=VCFv4.3
+##fileDate=20220320
+##source=syri
+##ALT=<ID=SYN,Description="Syntenic region">
+##ALT=<ID=INV,Description="Inversion">
+##ALT=<ID=TRANS,Description="Translocation">
+##ALT=<ID=INVTR,Description="Inverted Translocation">
+##ALT=<ID=DUP,Description="Duplication">
+##ALT=<ID=INVDP,Description="Inverted Duplication">
+##ALT=<ID=SYNAL,Description="Syntenic alignment">
+##ALT=<ID=INVAL,Description="Inversion alignment">
+##ALT=<ID=TRANSAL,Description="Translocation alignment">
+##ALT=<ID=INVTRAL,Description="Inverted Translocation alignment">
+##ALT=<ID=DUPAL,Description="Duplication alignment">
+##ALT=<ID=INVDPAL,Description="Inverted Duplication alignment">
+##ALT=<ID=HDR,Description="Highly diverged regions">
+##ALT=<ID=INS,Description="Insertion in non-reference genome">
+##ALT=<ID=DEL,Description="Deletion in non-reference genome">
+##ALT=<ID=CPG,Description="Copy gain in non-reference genome">
+##ALT=<ID=CPL,Description="Copy loss in non-reference genome">
+##ALT=<ID=SNP,Description="Single nucleotide polymorphism">
+##ALT=<ID=TDM,Description="Tandem repeat">
+##ALT=<ID=NOTAL,Description="Not Aligned region">
+##INFO=<ID=END,Number=1,Type=Integer,Description="End position on reference genome">
+##INFO=<ID=ChrB,Number=1,Type=String,Description="Chromoosme ID on the non-reference genome">
+##INFO=<ID=StartB,Number=1,Type=Integer,Description="Start position on non-reference genome">
+##INFO=<ID=EndB,Number=1,Type=Integer,Description="End position on non-reference genome">
+##INFO=<ID=Parent,Number=1,Type=String,Description="ID of the parent SR">
+##INFO=<ID=VarType,Number=1,Type=String,Description="Start position on non-reference genome">
+##INFO=<ID=DupType,Number=1,Type=String,Description="Copy gain or loss in the non-reference genome">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+Chr01	1	NOTAL1	N	<NOTAL>	.	PASS	END=148;ChrB=.;StartB=.;EndB=.;Parent=.;VarType=.;DupType=.
+Chr01	149	SYN1	N	<SYN>	.	PASS	END=3924;ChrB=Chr01_RagTag;StartB=69470;EndB=73233;Parent=.;VarType=SR;DupType=-
+Chr01	149	SYNAL1	N	<SYNAL>	.	PASS	END=3924;ChrB=Chr01_RagTag;StartB=69470;EndB=73233;Parent=SYN1;VarType=.;DupType=.
+Chr01	1326	INVDP20698	N	<INVDP>	.	PASS	END=2952;ChrB=Chr01_RagTag;StartB=4;EndB=1631;Parent=.;VarType=SR;DupType=copygain
+Chr01	1326	INVDPAL27850	N	<INVDPAL>	.	PASS	END=2952;ChrB=Chr01_RagTag;StartB=1631;EndB=4;Parent=INVDP20698;VarType=.;DupType=.
+Chr01	48658	DUPAL47049	N	<DUPAL>	.	PASS	END=52244;ChrB=Chr01_RagTag;StartB=62767;EndB=66349;Parent=DUP31188;VarType=.;DupType=.
+Chr01	54986	TRANS19363	N	<TRANS>	.	PASS	END=56366;ChrB=Chr01_RagTag;StartB=91234735;EndB=91236129;Parent=.;VarType=SR;DupType=-
+Chr01	54986	TRANSAL27952	N	<TRANSAL>	.	PASS	END=56366;ChrB=Chr01_RagTag;StartB=91234735;EndB=91236129;Parent=TRANS19363;VarType=.;DupType=.
+Chr01	71676	DUP29662	N	<DUP>	.	PASS	END=73604;ChrB=Chr10_RagTag;StartB=62726329;EndB=62728270;Parent=.;VarType=SR;DupType=copygain
+Chr01	71676	DUPAL39683	N	<DUPAL>	.	PASS	END=73604;ChrB=Chr10_RagTag;StartB=62726329;EndB=62728270;Parent=DUP29662;VarType=.;DupType=.
+Chr01	103038	DUPAL59681	N	<DUPAL>	.	PASS	END=104473;ChrB=Chr02_RagTag;StartB=74649406;EndB=74650839;Parent=DUP42672;VarType=.;DupType=.
+Chr01	103038	DUPAL59682	N	<DUPAL>	.	PASS	END=105181;ChrB=Chr10_RagTag;StartB=20287138;EndB=20289292;Parent=DUP42673;VarType=.;DupType=.
+Chr01	292608	INVTR23529	N	<INVTR>	.	PASS	END=293597;ChrB=Chr09_RagTag;StartB=6233364;EndB=6234350;Parent=.;VarType=SR;DupType=-
+Chr01	292608	INVTRAL30795	N	<INVTRAL>	.	PASS	END=293597;ChrB=Chr09_RagTag;StartB=6234350;EndB=6233364;Parent=INVTR23529;VarType=.;DupType=.
