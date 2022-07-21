@@ -37,7 +37,7 @@ library(reshape2)
 ```{r}
 duplications <- read.table("DuplicationsPerInterval_Example.csv",header=TRUE,sep = ',')
 
-duplications <- duplications %>% select(-c(pi300119, sweetAVG, biomassAVG, distance))
+duplications <- duplications %>% select(-c(pi300119))
 
 #Note that you need to shift counts for each strain to their own column, and have a column for strain name.
 #Use gather() for this
