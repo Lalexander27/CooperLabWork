@@ -1,0 +1,251 @@
+---
+title: "PermutationTests"
+author: "Louie Alexander"
+date: '2022-06-21'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#change access and/or change setwd for your computer
+access = "Louie"
+
+if(access =="Louie") {
+  setwd("C:\\Users\\louie\\Desktop\\ResearchFiles\\RPlotting")
+}
+
+```
+
+```{r}
+
+if (!require(readxl)) {
+  install.packages("readxl")
+}
+if (!require(tidyverse)) {
+  install.packages("tidyverse")
+}
+if (!require(reshape2)) {
+  install.packages("reshape2")
+}
+
+library(readxl)
+library(tidyverse)
+library(reshape2)
+
+```
+#Grab data and prepare dataframe
+```{r}
+duplications <- read.table("DuplicationsPerInterval_Example.csv",header=TRUE,sep = ',')
+
+duplications <- duplications %>% select(-c(pi300119, sweetAVG, biomassAVG, distance))
+
+#Note that you need to shift counts for each strain to their own column, and have a column for strain name.
+#Use gather() for this
+tallData <- gather(duplications, strain, counts, rio:pi510757, factor_key = TRUE)
+tallData
+
+```
+
+#Make a dataframe per chromosome for each of reference
+```{r}
+chr1 <- tallData %>% filter(CHROM == "Chr01") 
+chr1 <- chr1[order(chr1$interval),]
+
+chr2 <- tallData %>% filter(CHROM == "Chr02") 
+chr2 <- chr2[order(chr2$interval),]
+
+chr3 <- tallData %>% filter(CHROM == "Chr03") 
+chr3 <- chr3[order(chr3$interval),]
+
+chr4 <- tallData %>% filter(CHROM == "Chr04") 
+chr4 <- chr4[order(chr4$interval),]
+
+chr5 <- tallData %>% filter(CHROM == "Chr05") 
+chr5 <- chr5[order(chr5$interval),]
+
+chr6 <- tallData %>% filter(CHROM == "Chr06") 
+chr6 <- chr6[order(chr6$interval),]
+
+chr7 <- tallData %>% filter(CHROM == "Chr07") 
+chr7 <- chr7[order(chr7$interval),]
+
+chr8 <- tallData %>% filter(CHROM == "Chr08") 
+chr8 <- chr8[order(chr8$interval),]
+
+chr9 <- tallData %>% filter(CHROM == "Chr09") 
+chr9 <- chr9[order(chr9$interval),]
+
+chr10 <- tallData %>% filter(CHROM == "Chr10") 
+chr10 <- chr10[order(chr10$interval),]
+```
+
+#make a function to get difference matix for each interval
+```{r}
+#writing function to return a difference matrix for a given dataframe above
+getDifferences <- function(dataframe){
+
+intervals <- length(dataframe$interval)/9
+inter <- c(0:intervals)
+diff <- c(rep(0,intervals+1))
+diffMatrix <- data.frame(inter, diff)
+
+for(i in 0:intervals){
+  calc <- dataframe %>% filter(interval == i)
+  diffMatrix[i+1,2] = abs(mean(calc$counts[calc$strain %in% c("rio", "leoti", "CA")]) - mean(calc$counts[calc$strain %in% c("pi297155", "pi229841", "pi329311", "pi506069", "pi655972", "pi510757")])) 
+}
+return(diffMatrix)
+}
+```
+
+#test the function on chromosome 1 data
+```{r}
+chr1Diffs <- getDifferences(chr1)
+```
+
+#Make function for permutation tests that generates a p-value.
+#Currently works for 1 interval of a chromosome
+```{r}
+
+
+#inter is the desired interval and tests is the desired number of tests
+permutation.test <- function(dataframe, inters, tests){
+  
+differences <- getDifferences(dataframe)
+
+dataframe <- dataframe %>% filter(interval == inters)
+
+#set up a matrix with dimensions: number of strains x number of tests desired
+permutationMatrix = matrix(0,nrow = 9, ncol = tests)
+
+#initialize matrix for the test differences per permutation
+testDiffs <- rep(0, tests)
+  
+  
+for(i in 1:tests){
+  permutationMatrix[, i] <- sample(dataframe$counts, size = 9, replace = FALSE)
+}
+
+for (i in 1:tests){
+    testDiffs[i] <- abs(mean(permutationMatrix[dataframe$strain %in% c("rio", "leoti", "CA"), i]) - mean(permutationMatrix[dataframe$strain %in% c("pi297155", "pi229841", "pi329311", "pi506069", "pi655972", "pi510757"), i]))
+}  
+
+pvalue = sum(testDiffs >= differences$diff[differences$inter==inters])/tests
+
+return(pvalue)
+}
+```
+
+#Test that function gives p-value
+```{r}
+test <- permutation.test(chr1, 0, 1000000)
+print(test)
+```
+
+#Write a function that goes through each interval for a chromosome
+```{r}
+
+#set seed means we have a predefined number generator for our samplings
+set.seed(1979000000) 
+
+AllIntervals <- function(dataframe, test){
+  
+len <- length(dataframe$interval)/9
+Intervals <- c(0:len)
+Chromosome <- rep(dataframe[1,"CHROM"],len+1)
+P_Value <- rep(0,len+1) 
+
+results = data.frame(Chromosome, Intervals, P_Value)
+
+for (i in Intervals){
+  if (i %in% dataframe$interval){
+  results[i+1,"P_Value"] = permutation.test(dataframe, i, test)
+  }
+  else{
+    results[i+1,"P_Value"] = 1.00
+  }
+}
+return(results)
+}
+
+```
+
+#test that function gives dataframe of results
+```{r}
+#max number of permutations is n!
+#factorial(9) #=362880
+
+#1000 iterations is fine
+#resultsChr1 <- AllIntervals(chr1, 1000)
+#resultsChr1_5k <- AllIntervals(chr1,5000)
+#resultsChr1_10k <- AllIntervals(chr1,10000)
+
+#this number of permutations surpasses the max number
+#resultsChr1_100k <- AllIntervals(chr1,100000)
+```
+
+#Looking at the independence test of coin for reference
+```{r}
+library(coin)
+
+testing <- chr1 %>% filter(interval==49) %>% mutate(category = ifelse(strain %in% c("rio", "leoti", "CA"), "sweet", "biomass"))
+
+#gives similar result as 1k iterations
+independence_test(counts~factor(category), data=testing)
+```
+
+#Filter to significant differences of Chr01
+```{r}
+#signifChr1 <- resultsChr1 %>% filter(P_Value < 0.05)
+#signifChr1 <- left_join(signifChr1, chr1Diffs, by = c("Intervals" = "inter"))
+#signifChr1 <- signifChr1[order(signifChr1$P_Value),]
+
+#replicate this in a function:
+getSignificance <- function(ChrData, tests){
+differences <- getDifferences(ChrData)
+
+results <- AllIntervals(ChrData, tests)
+
+signif <- results %>% filter(P_Value < 0.05)
+signif <- left_join(signif, differences, by = c("Intervals" = "inter"))
+signif <- signif[order(signif$P_Value),]
+
+return(signif)
+}
+
+```
+
+#Significance of all chromosomes
+```{r}
+#set seed means we have a predefined number generator for our samplings
+set.seed(1979000000) 
+
+finalChr1 <- getSignificance(chr1, 1000)
+finalChr2 <- getSignificance(chr2, 1000)
+finalChr3 <- getSignificance(chr3, 1000)
+finalChr4 <- getSignificance(chr4, 1000)
+finalChr5 <- getSignificance(chr5, 1000)
+finalChr6 <- getSignificance(chr6, 1000)
+finalChr7 <- getSignificance(chr7, 1000)
+finalChr8 <- getSignificance(chr8, 1000)
+finalChr9 <- getSignificance(chr9, 1000)
+finalChr10 <- getSignificance(chr10, 1000)
+
+```
+
+#merge final data
+```{r}
+merge <- full_join(finalChr1, finalChr2)
+merge <- full_join(merge, finalChr3)
+merge <- full_join(merge, finalChr4)
+merge <- full_join(merge, finalChr5)
+merge <- full_join(merge, finalChr6)
+merge <- full_join(merge, finalChr7)
+merge <- full_join(merge, finalChr8)
+merge <- full_join(merge, finalChr9)
+merge <- full_join(merge, finalChr10)
+```
+
+```{r}
+write.csv(merge, "SignificantDuplications.csv")
+```
+
