@@ -1,0 +1,274 @@
+---
+title: "PrepComparisons"
+author: "Louie Alexander"
+date: '2022-06-15'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+access = "Louie"
+if(access =="Louie") {
+  setwd("C:\\Users\\louie\\Desktop\\ResearchFiles\\RPlotting\\CircosPlotsFiles")
+}
+
+if (!require(readxl)) {
+  install.packages("readxl")
+}
+if (!require(tidyverse)) {
+  install.packages("tidyverse")
+}
+if (!require(circlize)) {
+  install.packages("circlize")
+}
+
+library(readxl)
+library(tidyverse)
+library(circlize)
+```
+
+
+```{r}
+#Prep stuff for interval counting
+duplications <- read.table("final_duplications_HeaderAdjusted.vcf",header=TRUE,sep = '\t')
+duplications$interval = floor(duplications$POS/1000000)
+```
+
+```{r}
+#This chunk is used for processing INFO to pull out the end position of the feature.  Then, features are filtered for large structural variants (>= 50 bp)
+stringChunk <- c(duplications$INFO)
+parsedString <- gsub("[END=]", "", stringChunk)
+endNumber <- as.numeric(gsub(".*?([0-9]+).*", "\\1", parsedString))
+duplications <- duplications %>% mutate(END = endNumber, RANGE = END - POS) %>% filter(RANGE >= 50)
+#All duplications are >= 50 bp
+```
+
+```{r}
+CA_filtered <- duplications %>% filter(CA != '0/0')
+pi655_filtered <- duplications %>% filter(X655972 != '0/0')
+pi510_filtered <- duplications %>% filter(X510757 != '0/0')
+pi506_filtered <- duplications %>% filter(X506069 != '0/0')
+pi329_filtered <- duplications %>% filter(X329311 != '0/0')    
+leoti_filtered <- duplications %>% filter(leoti != '0/0')        
+pi229_filtered <- duplications %>% filter(pi229841 != '0/0')
+pi297_filtered <- duplications %>% filter(pi297155 != '0/0')    
+rio_filtered <- duplications %>% filter(rio != '0/0')   
+```
+
+```{r}
+#This counts the numbers of features per 1M bp
+CA = CA_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(CA = n)
+pi655 = pi655_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(pi655972 = n)
+pi510 = pi510_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(pi510757 = n)
+pi506 = pi506_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(pi506069 = n)
+pi329 = pi329_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(pi329311 = n)
+leoti = leoti_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(leoti = n)
+pi229 = pi229_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(pi229841 = n)
+pi297 = pi297_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(pi297155 = n)
+rio = rio_filtered %>% group_by(CHROM) %>% count(interval)  %>% rename(rio = n)
+```
+
+```{r}
+merges <- full_join(CA, pi655, by = c("interval", "CHROM"))
+merges <- full_join(merges, pi510, by = c("interval", "CHROM"))
+merges <- full_join(pi506, merges, by =  c("interval", "CHROM"))
+merges <- full_join(pi329, merges, by =  c("interval", "CHROM"))
+merges <- full_join(leoti, merges, by =  c("interval", "CHROM"))
+merges <- full_join(pi229, merges, by = c("interval", "CHROM"))
+merges <- full_join(pi297, merges, by =  c("interval", "CHROM"))
+merges <- full_join(rio, merges, by =  c("interval", "CHROM"))
+
+#add averages for merged freqs for sweet variety and biomass variety, then make sure that strains with 0 features at a given column have 0 instead of NA:
+avg_Distance <- merges %>% mutate(sweetAVG = 0, biomassAVG = 0, 
+                            rio = ifelse(is.na(rio), 0, rio), pi297155 = ifelse(is.na(pi297155), 0, pi297155), pi229841 = ifelse(is.na(pi229841), 0, pi229841), leoti = ifelse(is.na(leoti), 0, leoti), pi329311 = ifelse(is.na(pi329311), 0, pi329311), pi506069 = ifelse(is.na(pi506069), 0, pi506069), 
+                            pi510757 = ifelse(is.na(pi510757), 0, pi510757), pi655972 = ifelse(is.na(pi655972), 0, pi655972), CA = ifelse(is.na(CA), 0, CA)) 
+
+#order the dataframe by interval
+avg_Distance <- avg_Distance[order(avg_Distance$interval),]
+
+#Go through each row to find means for sweet and biomass
+for (row in 1:nrow(avg_Distance)) {
+  #add avg for Sweet sorghum
+  avg_Distance[row,13] = round(mean(unlist(c(avg_Distance[row,3], avg_Distance[row,10], avg_Distance[row,6]))), 2)
+  #add avg for Biomass sorghum
+  avg_Distance[row,14] = round(mean(unlist(c(avg_Distance[row,11], avg_Distance[row,12], avg_Distance[row,9], avg_Distance[row,8], avg_Distance[row,5], avg_Distance[row,4]))), 2) 
+} 
+
+avg_Distance <- avg_Distance %>% mutate(distance = abs(sweetAVG - biomassAVG)) 
+
+#A value of 2.0 represents the lowest 50 quantiles so >= 2.0 is showing the greatest 50 quantiles
+quantile(avg_Distance$distance)
+
+#A value below 7.17 is the lowest 95 quartiles, while a value >= 7.17 is the top 5 quartiles
+quantile(avg_Distance$distance, probs = seq(0, 1, 0.05))
+
+
+avg_Distance <- avg_Distance %>% mutate(Color50Q = case_when(distance < 2.0 ~ 1, distance >= 2.0 & sweetAVG > biomassAVG ~ 2, distance >= 2.0 & sweetAVG < biomassAVG ~ 3)) %>% mutate(Color95Q = case_when(distance < 7.17 ~ 1, distance >= 7.17 & sweetAVG > biomassAVG ~ 2, distance >= 7.17 & sweetAVG < biomassAVG ~ 3))
+
+avg_Distance <- avg_Distance%>% mutate(END = interval + 1)
+```
+
+```{r}
+write.csv(avg_Distance, "DuplicationComparisons_SV.csv")
+```
+
+##Next look into Deletions
+```{r}
+deletions <- read.table("deletion_merge_noheader.vcf",header=TRUE,sep = '\t')
+deletions$interval = floor(deletions$POS/1000000)
+
+#filter based off the amount of characters deleted from Reference
+deletions<- deletions %>% mutate(SIZE = nchar(REF)) %>% filter(SIZE >= 50) 
+```
+
+```{r}
+CA_filtered <- deletions %>% filter(CA != '0/0')
+pi655_filtered <- deletions %>% filter(X655972 != '0/0')
+pi510_filtered <- deletions %>% filter(X510757 != '0/0')
+pi506_filtered <- deletions %>% filter(X506069 != '0/0')
+pi329_filtered <- deletions %>% filter(X329311 != '0/0')    
+leoti_filtered <- deletions %>% filter(leoti != '0/0')        
+pi229_filtered <- deletions %>% filter(X229841 != '0/0')
+pi297_filtered <- deletions %>% filter(X297155 != '0/0')    
+rio_filtered <- deletions %>% filter(rio != '0/0')   
+```
+
+```{r}
+#This counts the numbers of features per 1M bp
+CA = CA_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(CA = n)
+pi655 = pi655_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(pi655972 = n)
+pi510 = pi510_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(pi510757 = n)
+pi506 = pi506_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(pi506069 = n)
+pi329 = pi329_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(pi329311 = n)
+leoti = leoti_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(leoti = n)
+pi229 = pi229_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(pi229841 = n)
+pi297 = pi297_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(pi297155 = n)
+rio = rio_filtered %>% group_by(CHROM) %>% count(interval)  %>% rename(rio = n)
+```
+
+```{r}
+merges <- full_join(CA, pi655, by = c("interval", "CHROM"))
+merges <- full_join(merges, pi510, by = c("interval", "CHROM"))
+merges <- full_join(pi506, merges, by =  c("interval", "CHROM"))
+merges <- full_join(pi329, merges, by =  c("interval", "CHROM"))
+merges <- full_join(leoti, merges, by =  c("interval", "CHROM"))
+merges <- full_join(pi229, merges, by = c("interval", "CHROM"))
+merges <- full_join(pi297, merges, by =  c("interval", "CHROM"))
+merges <- full_join(rio, merges, by =  c("interval", "CHROM"))
+
+#add averages for merged freqs for sweet variety and biomass variety, then make sure that strains with 0 features at a given column have 0 instead of NA:
+avg_Distance <- merges %>% mutate(sweetAVG = 0, biomassAVG = 0, 
+                            rio = ifelse(is.na(rio), 0, rio), pi297155 = ifelse(is.na(pi297155), 0, pi297155), pi229841 = ifelse(is.na(pi229841), 0, pi229841), leoti = ifelse(is.na(leoti), 0, leoti), pi329311 = ifelse(is.na(pi329311), 0, pi329311), pi506069 = ifelse(is.na(pi506069), 0, pi506069), 
+                            pi510757 = ifelse(is.na(pi510757), 0, pi510757), pi655972 = ifelse(is.na(pi655972), 0, pi655972), CA = ifelse(is.na(CA), 0, CA)) 
+
+#order the dataframe by interval
+avg_Distance <- avg_Distance[order(avg_Distance$interval),]
+
+
+#Go through each row to find means for sweet and biomass
+for (row in 1:nrow(avg_Distance)) {
+  #add avg for Sweet sorghum
+  avg_Distance[row,13] = round(mean(unlist(c(avg_Distance[row,3], avg_Distance[row,10], avg_Distance[row,6]))), 2)
+  #add avg for Biomass sorghum
+  avg_Distance[row,14] = round(mean(unlist(c(avg_Distance[row,11], avg_Distance[row,12], avg_Distance[row,9], avg_Distance[row,8], avg_Distance[row,5], avg_Distance[row,4]))), 2) 
+} 
+
+avg_Distance <- avg_Distance %>% mutate(distance = abs(sweetAVG - biomassAVG)) 
+
+#A value of 1.92 represents the lowest 50 quantiles so >= 1.92 is showing the greatest 50 quantiles
+quantile(avg_Distance$distance)
+
+#A value below 3.835 is the lowest 95 quartiles, while a value >= 3.835 is the top 5 quartiles
+quantile(avg_Distance$distance, probs = seq(0, 1, 0.05))
+
+
+avg_Distance <- avg_Distance %>% mutate(Color50Q = case_when(distance < 1.92 ~ 1, distance >= 1.92 & sweetAVG > biomassAVG ~ 2, distance >= 1.92 & sweetAVG < biomassAVG ~ 3)) %>% mutate(Color95Q = case_when(distance < 3.835 ~ 1, distance >= 3.835 & sweetAVG > biomassAVG ~ 2, distance >= 3.835 & sweetAVG < biomassAVG ~ 3))
+
+avg_Distance <- avg_Distance%>% mutate(END = interval + 1)
+```
+
+```{r}
+write.csv(avg_Distance, "DeletionComparisons_SV.csv")
+```
+
+
+##Next look into Insertions
+```{r}
+insertions <- read.table("insertion_merge_noheader.vcf",header=TRUE,sep = '\t')
+insertions$interval = floor(insertions$POS/1000000)
+
+#Filter to find features longer than/equal to 50 bp
+insertions$ALT <- gsub(",", "", insertions$ALT)
+insertions <- insertions %>% mutate(SIZEINS = nchar(ALT)) %>% filter(SIZEINS >= 50)
+```
+
+```{r}
+CA_filtered <- insertions %>% filter(CA != '0/0')
+pi655_filtered <- insertions %>% filter(X655972 != '0/0')
+pi510_filtered <- insertions %>% filter(X510757 != '0/0')
+pi506_filtered <- insertions %>% filter(X506069 != '0/0')
+pi329_filtered <- insertions %>% filter(X329311 != '0/0')  
+leoti_filtered <- insertions %>% filter(leoti != '0/0')        
+pi229_filtered <- insertions %>% filter(X229841 != '0/0')
+pi297_filtered <- insertions %>% filter(X297155 != '0/0')    
+rio_filtered <- insertions %>% filter(rio != '0/0')   
+```
+
+```{r}
+#This counts the numbers of features per 1M bp
+CA = CA_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(CA = n)
+pi655 = pi655_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(pi655972 = n)
+pi510 = pi510_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(pi510757 = n)
+pi506 = pi506_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(pi506069 = n)
+pi329 = pi329_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(pi329311 = n)
+leoti = leoti_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(leoti = n)
+pi229 = pi229_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(pi229841 = n)
+pi297 = pi297_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(pi297155 = n)
+rio = rio_filtered %>% group_by(CHROM) %>% count(interval)  %>% rename(rio = n)
+```
+
+```{r}
+merges <- full_join(CA, pi655, by = c("interval", "CHROM"))
+merges <- full_join(merges, pi510, by = c("interval", "CHROM"))
+merges <- full_join(pi506, merges, by =  c("interval", "CHROM"))
+merges <- full_join(pi329, merges, by =  c("interval", "CHROM"))
+merges <- full_join(leoti, merges, by =  c("interval", "CHROM"))
+merges <- full_join(pi229, merges, by = c("interval", "CHROM"))
+merges <- full_join(pi297, merges, by =  c("interval", "CHROM"))
+merges <- full_join(rio, merges, by =  c("interval", "CHROM"))
+
+#add averages for merged freqs for sweet variety and biomass variety, then make sure that strains with 0 features at a given column have 0 instead of NA:
+avg_Distance <- merges %>% mutate(sweetAVG = 0, biomassAVG = 0, 
+                            rio = ifelse(is.na(rio), 0, rio), pi297155 = ifelse(is.na(pi297155), 0, pi297155), pi229841 = ifelse(is.na(pi229841), 0, pi229841), leoti = ifelse(is.na(leoti), 0, leoti), 
+                            pi300119 = ifelse(is.na(pi300119), 0, pi300119), pi329311 = ifelse(is.na(pi329311), 0, pi329311), pi506069 = ifelse(is.na(pi506069), 0, pi506069), 
+                            pi510757 = ifelse(is.na(pi510757), 0, pi510757), pi655972 = ifelse(is.na(pi655972), 0, pi655972), CA = ifelse(is.na(CA), 0, CA)) 
+
+#order the dataframe by interval
+avg_Distance <- avg_Distance[order(avg_Distance$interval),]
+
+
+#Go through each row to find means for sweet and biomass
+for (row in 1:nrow(avg_Distance)) {
+  #add avg for Sweet sorghum
+  avg_Distance[row,13] = round(mean(unlist(c(avg_Distance[row,3], avg_Distance[row,10], avg_Distance[row,6]))), 2)
+  #add avg for Biomass sorghum
+  avg_Distance[row,14] = round(mean(unlist(c(avg_Distance[row,11], avg_Distance[row,12], avg_Distance[row,9], avg_Distance[row,8], avg_Distance[row,5], avg_Distance[row,4]))), 2) 
+} 
+
+avg_Distance <- avg_Distance %>% mutate(distance = abs(sweetAVG - biomassAVG)) 
+
+#A value of 2.0 represents the lowest 50 quantiles so >= 2.0 is showing the greatest 50 quantiles
+quantile(avg_Distance$distance)
+
+#A value below 7.17 is the lowest 95 quartiles, while a value >= 7.17 is the top 5 quartiles
+quantile(avg_Distance$distance, probs = seq(0, 1, 0.05))
+
+
+avg_Distance <- avg_Distance %>% mutate(Color50Q = case_when(distance < 2.0 ~ 1, distance >= 2.0 & sweetAVG > biomassAVG ~ 2, distance >= 2.0 & sweetAVG < biomassAVG ~ 3)) %>% mutate(Color95Q = case_when(distance < 7.17 ~ 1, distance >= 7.17 & sweetAVG > biomassAVG ~ 2, distance >= 7.17 & sweetAVG < biomassAVG ~ 3))
+
+avg_Distance <- avg_Distance%>% mutate(END = interval + 1)
+```
+
+```{r}
+write.csv(avg_Distance, "InsertionComparisons_SV.csv")
+```
