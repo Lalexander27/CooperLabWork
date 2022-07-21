@@ -187,7 +187,7 @@ return(results)
 ```{r}
 library(coin)
 
-testing <- chr1 %>% filter(interval==49) %>% mutate(category = ifelse(strain %in% c("rio", "leoti", "CA"), "sweet", "biomass"))
+testing <- chr1 %>% filter(interval==1) %>% mutate(category = ifelse(strain %in% c("rio", "leoti", "CA"), "sweet", "biomass"))
 
 #gives similar result as 1k iterations
 independence_test(counts~factor(category), data=testing)
