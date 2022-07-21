@@ -36,7 +36,7 @@ library(reshape2)
 
 ```{r}
 #This is the ".vcf" file for Duplications that documents which strains a given duplication occurs in
-duplications <- read.table("final_duplications_HeaderAdjusted.vcf",header=TRUE,sep = '\t')
+duplications <- read.table("duplicationCounts_Example.vcf",header=TRUE,sep = '\t')
 ```
 
 ```{r}
