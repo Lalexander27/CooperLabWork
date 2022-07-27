@@ -10,7 +10,7 @@ def geneIntervals(intervals, geneLoci, annotation):
 				line = line.rstrip().split(",")
 				keyIntervals.append((line[0], line[1]))
 
-	with open("GenesInIntervalsTEST.txt", "w") as genes:
+	with open("GenesInInterval.txt", "w") as genes:
 	#header for tsv
 		genes.write("Chromosome\tFeature\tStart\tEnd\tGene ID\tPac ID\tTranscript ID\tGO\tArabidopsis Gene\tArabi. Symbol\tArabi. Description\tRice Gene\tRice Symbol\tRice Description\n")
 	
