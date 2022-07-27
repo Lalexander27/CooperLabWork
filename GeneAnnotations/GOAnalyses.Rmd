@@ -78,7 +78,7 @@ head(GenTable(GO_BP, classicFisher = fisherRes, elimFisher = fisherResElim, orde
 ```{r}
 #These two lines just prep the output
 png <- fs::path(knitr::fig_path(), "BP_GOSig.png")
-agg_png(png, width = 45, height = 55, units = "cm", res = 700, scaling = 4) 
+agg_png(png, width = 5, height = 5, units = "cm", res = 400, scaling = 1.0) 
 
 #This shows the connections between signif GO terms
 showSigOfNodes(GO_BP, score(fisherRes), firstSigNodes = 5, useInfo = 'all')
