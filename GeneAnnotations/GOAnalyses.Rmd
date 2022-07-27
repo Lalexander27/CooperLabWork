@@ -1,0 +1,100 @@
+---
+title: "GO"
+author: "Louie Alexander"
+date: '2022-07-13'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+#change access and/or change setwd for your computer
+access = "Louie"
+
+if(access =="Louie") {
+  setwd("C:\\Users\\louie\\Desktop\\ResearchFiles\\RPlotting\\PermutationTesting")
+}
+
+```
+
+```{r}
+if (!require("BiocManager"))
+    install.packages("BiocManager")
+#BiocManager::install(ask=FALSE, force = TRUE)
+#BiocManager::install("topGO", ask=FALSE, force = TRUE)
+#BiocManager::install("GO.db", ask=FALSE, force = TRUE)
+#BiocManager::install("ragg", ask=FALSE, force = TRUE)
+#BiocManager::install("Rgraphviz")
+library(Rgraphviz)
+library("topGO")
+library("ragg")
+```
+
+```{r}
+#This is full list of GO terms for sorghum (received from Will)
+GOTerms <- readMappings("gene_to_GO.txt")
+names <- names(GOTerms)
+```
+
+```{r}
+#This is your input of genes of interest
+SignIntervals <- read.table("GODupl.txt", sep = "\t", header = TRUE) 
+
+#This pulls the gene IDs and puts them in a list
+list <- SignIntervals$Transcript.ID
+
+#This compares the full list of all genes and then marks whether they are genes of interest (0 vs 1)
+geneList <- factor(as.integer(names %in% list))
+
+#This cuts the full list of genes down to those of interest
+names(geneList) <- names
+```
+
+```{r}
+#This checks the biological function (BP) of the GO terms.  Can try molecular function(MF) or other 
+GO_BP <- new("topGOdata", ontology = "BP", allGenes = geneList, annot = annFUN.gene2GO, gene2GO = GOTerms)
+```
+
+```{r}
+### fisher test
+fisherRes <- runTest(GO_BP, algorithm = "classic", statistic = "fisher")
+#elim is a cutoff test for significance
+fisherResElim <- runTest(GO_BP, algorithm = "elim", statistic = "fisher")
+
+### p-values scatter plot for the classic and elim methods
+pFisher <- score(fisherRes)
+pFisherElim <- score(fisherResElim)[names(pFisher)]
+```
+
+```{r}
+plot(pFisher, pFisherElim, xlab = "p-value classic", ylab = "p-value elim", main = "p-values scatter plot (BP ontology)", cex = 0.5, col = 'darkred')
+```
+
+```{r}
+#This pulls out the top 25 significant GO terms that were enriched.  Can change last number to shorten/lengthen table
+head(GenTable(GO_BP, classicFisher = fisherRes, elimFisher = fisherResElim, orderBy = "classicFisher", ranksOf = "classicFisher", topNodes = 500),25)
+```
+
+```{r}
+#These two lines just prep the output
+png <- fs::path(knitr::fig_path(), "BP_GOSig.png")
+agg_png(png, width = 45, height = 55, units = "cm", res = 700, scaling = 4) 
+
+#This shows the connections between signif GO terms
+showSigOfNodes(GO_BP, score(fisherRes), firstSigNodes = 5, useInfo = 'all')
+
+#this makes output
+invisible(dev.off())
+knitr::include_graphics(png)
+```
+
+```{r}
+allGO <- genesInTerm(GO_BP)
+#This pulls out genes of interest that had the GO term 0048544
+allGO["GO:0048544"]
+RetrivedGenes <- lapply(allGO,function(x) x[x %in% SignIntervals$Transcript.ID])
+
+#This pulls out significant loci that had GO term of interest
+RetrivedGenes[["GO:0048544"]]
+```
+
