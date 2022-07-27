@@ -14,9 +14,7 @@ def geneIntervals(intervals, geneLoci, annotation):
 	#header for tsv
 		genes.write("Chromosome\tFeature\tStart\tEnd\tGene ID\tPac ID\tTranscript ID\tGO\tArabidopsis Gene\tArabi. Symbol\tArabi. Description\tRice Gene\tRice Symbol\tRice Description\n")
 	
-		print(keyIntervals)
 		for interval in keyIntervals:
-			print(interval)
 			startIntv = (int(interval[1])) * 1000000
 			endIntv = int(startIntv) + 1000000
 
