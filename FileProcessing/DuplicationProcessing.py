@@ -3,7 +3,8 @@ import sys
 def pullOutDuplicates(inF, outF, distance):
 	#distance represents desired range to pull features (in bp).  0 looks for exact matches, while 30 looks for other features that have a start position within 30 bp of the given line
 	#This is intended to open a file of Duplications from processed SyRI VCF files
-
+	
+	
 	outFirst = outF.rstrip().split(".")[0] + "_DuplicatedFeatures.vcf"
 	outSecond = outF.rstrip().split(".")[0] + "_NoOverlap.vcf"
 
@@ -67,6 +68,11 @@ def main():
 		bpDist = int(sys.argv[3])
 		if fileName.split(".")[1] != "vcf":
 			raise ValueError
+			
+		#If the output file name already has ".vcf", then save the name without ".vcf"
+		if outputFileName.split(".")[1] == "vcf":
+			outputFileName = outputFileName.split(".")[0]
+		
 	except ValueError:
 		print(f'Please type input file, output file name, and desired distance (in bp) to check for duplicated features. Input file should be a .vcf, and the distance should be an integer value.')
 	else:
