@@ -60,14 +60,15 @@ def pullOutDuplicates(inF, outF, distance):
 
 def main():
 	#user sys.argv to pull arguments from the command line.  Note that arguments are all strings and index 0 is just the file name.  I designed this so that the first argument is the file name and second argument is the number 
+	#Command line order should be as follows: python3 <.py file> <.vcf output file from Syri, filtered for duplications> <desired output file name> <integer value used to check proximity of duplications>
 	try:
 		fileName = sys.argv[1]
 		outputFileName = sys.argv[2]
 		bpDist = int(sys.argv[3])
-		if fileName.split(".")[1] != "vcf" and outputFileName.split(".")[1] != "vcf":
+		if fileName.split(".")[1] != "vcf":
 			raise ValueError
 	except ValueError:
-		print(f'Please type input file and desired distance (bp) to check for duplicated features. Input file should be a .vcf')
+		print(f'Please type input file, output file name, and desired distance (in bp) to check for duplicated features. Input file should be a .vcf, and the distance should be an integer value.')
 	else:
 		pullOutDuplicates(fileName, outputFileName, bpDist)
 
