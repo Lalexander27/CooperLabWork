@@ -1,12 +1,12 @@
 import sys
 
-def pullOutDuplicates(inF, outF, distance):
+def pullOutDuplicates(inF, distance):
 	#distance represents desired range to pull features (in bp).  0 looks for exact matches, while 30 looks for other features that have a start position within 30 bp of the given line
 	#This is intended to open a file of Duplications from processed SyRI VCF files
 	
-	
-	outFirst = outF.rstrip() + "_DuplicatedFeatures.vcf"
-	outSecond = outF.rstrip() + "_NoOverlap.vcf"
+	inName = inF.split(".")[0]
+	outFirst = inName.rstrip() + "_DuplicatedFeatures.vcf"
+	outSecond = inName.rstrip() + "_NoOverlap.vcf"
 
 	with open(inF) as inputFile:
 		with open(outFirst, "w") as outputFile1:
@@ -61,22 +61,17 @@ def pullOutDuplicates(inF, outF, distance):
 
 def main():
 	#user sys.argv to pull arguments from the command line.  Note that arguments are all strings and index 0 is just the file name.  I designed this so that the first argument is the file name and second argument is the number 
-	#Command line order should be as follows: python3 <.py file> <.vcf output file from Syri, filtered for duplications> <desired output file name> <integer value used to check proximity of duplications>
+	#Command line order should be as follows: python3 <.py file> <.vcf output file from Syri, filtered for duplications> <integer value used to check proximity of duplications>
 	try:
 		fileName = sys.argv[1]
-		outputFileName = sys.argv[2]
-		bpDist = int(sys.argv[3])
+		bpDist = int(sys.argv[2])
 		if fileName.split(".")[1] != "vcf":
 			raise ValueError
-			
-		#If the output file name already has ".vcf", then save the name without ".vcf"
-		if outputFileName.split(".")[1] == "vcf":
-			outputFileName = outputFileName.split(".")[0]
 		
 	except ValueError:
-		print(f'Please type input file, output file name, and desired distance (in bp) to check for duplicated features. Input file should be a .vcf, and the distance should be an integer value.')
+		print(f'Please type input file and desired distance (in bp) to check for duplicated features. Input file should be a .vcf, and the distance should be an integer value.')
 	else:
-		pullOutDuplicates(fileName, outputFileName, bpDist)
+		pullOutDuplicates(fileName, bpDist)
 
 if __name__ == '__main__':
 	main()
