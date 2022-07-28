@@ -66,7 +66,8 @@ def geneIntervals(intervals, geneLoci, annotation):
 							genes.write("\t".join(newLine))
 						
 def main():
-	#user sys.argv to pull arguments from the command line.  Note that arguments are all strings and index 0 is just the file name.  I designed this so that the first argument is the file name and second argument is the number 
+	#user sys.argv to pull arguments from the command line.  Note that arguments are all strings and index 0 is just the file name
+	#command line order should be as follows: python3 <.py file> <.csv file of intervals> <.gff or .gff3 file of gene features> <annotation file of gene loci and GO terms>
 	try:
 		intervalFile = sys.argv[1]
 		print(intervalFile.split(".")[1])
