@@ -31,7 +31,7 @@ python3 DuplicationProcessing.py rio.vcf 30
 python3 DuplicationProcessing.py pi229841.vcf 30
 python3 DuplicationProcessing.py pi297155.vcf 30
 
-#This adds the proper header and counts alleles for eahc filtered file
+#This adds the proper header and counts alleles for each filtered file
 python3 AddColumns.py pi300119_NoOverlap.vcf 300119
 python3 AddColumns.py pi329311_NoOverlap.vcf 329311
 python3 AddColumns.py pi506069_NoOverlap.vcf 506069
