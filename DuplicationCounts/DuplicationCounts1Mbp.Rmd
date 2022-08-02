@@ -47,42 +47,42 @@ chromosome$interval = floor(chromosome$POS/1000000)
 ```
 
 ```{r}
-CA_filtered <- chromosome %>% group_by(CHROM) %>% filter(CA != '0/0')
-pi655_filtered <- chromosome %>% group_by(CHROM) %>% filter(X655972 != '0/0')
-pi510_filtered <- chromosome %>% group_by(CHROM) %>% filter(X510757 != '0/0')
-pi506_filtered <- chromosome %>% group_by(CHROM) %>% filter(X506069 != '0/0')
-pi329_filtered <- chromosome %>% group_by(CHROM) %>% filter(X329311 != '0/0')    
-pi300_filtered <- chromosome %>% group_by(CHROM) %>% filter(X300119 != '0/0')     
-leoti_filtered <- chromosome %>% group_by(CHROM) %>% filter(leoti != '0/0')        
-pi229_filtered <- chromosome %>% group_by(CHROM) %>% filter(pi229841 != '0/0')
-pi297_filtered <- chromosome %>% group_by(CHROM) %>% filter(pi297155 != '0/0')    
-rio_filtered <- chromosome %>% group_by(CHROM) %>% filter(rio != '0/0')   
+CA_filtered <- chromosome %>% filter(CA != '0/0')
+pi655_filtered <- chromosome %>% filter(X655972 != '0/0')
+pi510_filtered <- chromosome %>% filter(X510757 != '0/0')
+pi506_filtered <- chromosome %>% filter(X506069 != '0/0')
+pi329_filtered <- chromosome %>% filter(X329311 != '0/0')    
+pi300_filtered <- chromosome %>% filter(X300119 != '0/0')     
+leoti_filtered <- chromosome %>% filter(leoti != '0/0')        
+pi229_filtered <- chromosome %>% filter(pi229841 != '0/0')
+pi297_filtered <- chromosome %>% filter(pi297155 != '0/0')    
+rio_filtered <- chromosome %>% filter(rio != '0/0')   
 ```
 
 ```{r}
 #This counts the numbers of features per 1M bp
-CA = CA_filtered %>% count(interval) %>% rename(CA = n)
-pi655 = pi655_filtered %>% count(interval) %>% rename(pi655972 = n)
-pi510 = pi510_filtered %>% count(interval) %>% rename(pi510757 = n)
-pi506 = pi506_filtered %>% count(interval) %>% rename(pi506069 = n)
-pi329 = pi329_filtered %>% count(interval) %>% rename(pi329311 = n)
-pi300 = pi300_filtered %>% count(interval) %>% rename(pi300119 = n)
-leoti = leoti_filtered %>% count(interval) %>% rename(leoti = n)
-pi229 = pi229_filtered %>% count(interval) %>% rename(pi229841 = n)
-pi297 = pi297_filtered %>% count(interval) %>% rename(pi297155 = n)
-rio = rio_filtered %>% count(interval)  %>% rename(rio = n)
+CA = CA_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(CA = n)
+pi655 = pi655_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(pi655972 = n)
+pi510 = pi510_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(pi510757 = n)
+pi506 = pi506_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(pi506069 = n)
+pi329 = pi329_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(pi329311 = n)
+pi300 = pi300_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(pi300119 = n)
+leoti = leoti_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(leoti = n)
+pi229 = pi229_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(pi229841 = n)
+pi297 = pi297_filtered %>% group_by(CHROM) %>% count(interval) %>% rename(pi297155 = n)
+rio = rio_filtered %>% group_by(CHROM) %>% count(interval)  %>% rename(rio = n)
 ```
 
 ```{r}
-merges <- full_join(CA, pi655, by = "interval")
-merges <- full_join(merges, pi510, by = "interval")
-merges <- full_join(pi506, merges, by = "interval")
-merges <- full_join(pi329, merges, by = "interval")
-#merges <- full_join(pi300, merges, by = "interval") commented out because the grassl line (300119) is neither a sweet nor biomass variety
-merges <- full_join(leoti, merges, by = "interval")
-merges <- full_join(pi229, merges, by = "interval")
-merges <- full_join(pi297, merges, by = "interval")
-merges <- full_join(rio, merges, by = "interval")
+merges <- full_join(CA, pi655)
+merges <- full_join(merges, pi510)
+merges <- full_join(pi506, merges)
+merges <- full_join(pi329, merges)
+#merges <- full_join(pi300, merges) commented out because the grassl line (300119) is neither a sweet nor biomass variety
+merges <- full_join(leoti, merges)
+merges <- full_join(pi229, merges)
+merges <- full_join(pi297, merges)
+merges <- full_join(rio, merges)
 
 ```
 
