@@ -65,7 +65,7 @@ def main():
 	try:
 		fileName = sys.argv[1]
 		bpDist = int(sys.argv[2])
-		if fileName.split(".")[1] != "vcf":
+		if not fileName.endswith("vcf"):
 			raise ValueError
 		
 	except ValueError:
