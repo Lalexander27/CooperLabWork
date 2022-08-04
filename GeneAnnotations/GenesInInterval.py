@@ -75,7 +75,7 @@ def main():
 		print(geneLocations.split(".")[1])
 		annotationText = sys.argv[3]
 		print(annotationText.split(".")[1])
-		if intervalFile.split(".")[1] != "csv" or geneLocations.split(".")[1] not in ("gff", "gff3"):
+		if not intervalFile.endswith("csv") or not geneLocations.endswith("gff") or not geneLocations.endswith("gff3"):
 			raise ValueError
 	except ValueError:
 		print(f'Please check extensions of files.')
