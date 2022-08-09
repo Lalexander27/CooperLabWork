@@ -97,16 +97,9 @@ return(diffMatrix)
 }
 ```
 
-#test the function on chromosome 1 data
-```{r}
-chr1Diffs <- getDifferences(chr1)
-```
-
 #Make function for permutation tests that generates a p-value.
 #Currently works for 1 interval of a chromosome
 ```{r}
-
-
 #inter is the desired interval and tests is the desired number of tests
 permutation.test <- function(dataframe, inters, tests){
   
@@ -133,12 +126,6 @@ pvalue = sum(testDiffs >= differences$diff[differences$inter==inters])/tests
 
 return(pvalue)
 }
-```
-
-#Test that function gives p-value
-```{r}
-test <- permutation.test(chr1, 0, 1000000)
-print(test)
 ```
 
 #Write a function that goes through each interval for a chromosome
@@ -169,24 +156,6 @@ return(results)
 
 ```
 
-#test that function gives dataframe of results
-```{r}
-#1000 iterations is fine
-resultsChr1 <- AllIntervals(chr1, 1000)
-resultsChr1_5k <- AllIntervals(chr1,5000)
-resultsChr1_10k <- AllIntervals(chr1,10000)
-```
-
-#Looking at the independence test of coin for reference
-```{r}
-library(coin)
-
-testing <- chr1 %>% filter(interval==1) %>% mutate(category = ifelse(strain %in% c("rio", "leoti", "CA"), "sweet", "biomass"))
-
-#gives similar result as 1k iterations
-independence_test(counts~factor(category), data=testing)
-```
-
 #Filter to significant differences of Chr01
 ```{r}
 getSignificance <- function(ChrData, tests){
@@ -205,7 +174,7 @@ return(signif)
 
 #Significance of all chromosomes
 ```{r}
-#set seed means we have a predefined number generator for our samplings
+#set seed means we have a predefined number generator for our sampling
 set.seed(1979000000) 
 
 finalChr1 <- getSignificance(chr1, 1000)
