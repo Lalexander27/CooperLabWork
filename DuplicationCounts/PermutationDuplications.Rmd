@@ -171,16 +171,10 @@ return(results)
 
 #test that function gives dataframe of results
 ```{r}
-#max number of permutations is n!
-#factorial(9) #=362880
-
 #1000 iterations is fine
-#resultsChr1 <- AllIntervals(chr1, 1000)
-#resultsChr1_5k <- AllIntervals(chr1,5000)
-#resultsChr1_10k <- AllIntervals(chr1,10000)
-
-#this number of permutations surpasses the max number
-#resultsChr1_100k <- AllIntervals(chr1,100000)
+resultsChr1 <- AllIntervals(chr1, 1000)
+resultsChr1_5k <- AllIntervals(chr1,5000)
+resultsChr1_10k <- AllIntervals(chr1,10000)
 ```
 
 #Looking at the independence test of coin for reference
@@ -195,11 +189,6 @@ independence_test(counts~factor(category), data=testing)
 
 #Filter to significant differences of Chr01
 ```{r}
-#signifChr1 <- resultsChr1 %>% filter(P_Value < 0.05)
-#signifChr1 <- left_join(signifChr1, chr1Diffs, by = c("Intervals" = "inter"))
-#signifChr1 <- signifChr1[order(signifChr1$P_Value),]
-
-#replicate this in a function:
 getSignificance <- function(ChrData, tests){
 differences <- getDifferences(ChrData)
 
