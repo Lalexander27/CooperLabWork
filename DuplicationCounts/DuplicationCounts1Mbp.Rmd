@@ -1,0 +1,139 @@
+---
+title: "DuplicationsPlotting"
+author: "Louie Alexander, modified from Will's code"
+date: '2022-05-26'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#change access and/or change setwd for your computer
+access = "Louie"
+
+if(access =="Louie") {
+  setwd("C:\\Users\\louie\\Documents\\TestingDups\\PermTest")
+}
+
+```
+
+```{r}
+
+if (!require(readxl)) {
+  install.packages("readxl")
+}
+if (!require(tidyverse)) {
+  install.packages("tidyverse")
+}
+if (!require(reshape2)) {
+  install.packages("reshape2")
+}
+
+library(readxl)
+library(tidyverse)
+library(reshape2)
+
+```
+
+```{r}
+#This is the ".vcf" file for Duplications that documents which strains a given duplication occurs in
+chromosome <- read.table("final_conserved_adj.vcf",header=TRUE,sep = '\t')
+```
+
+```{r} 
+
+#This splits the chromosome into "steps" of 1M bp in size
+chromosome$interval = floor(chromosome$POS/1000000)
+```
+
+```{r}
+CA_filtered <- chromosome %>% group_by(CHROM) %>% filter(CA != '0/0')
+pi655_filtered <- chromosome %>% group_by(CHROM) %>% filter(pi655972 != '0/0')
+pi510_filtered <- chromosome %>% group_by(CHROM) %>% filter(pi510757 != '0/0')
+pi506_filtered <- chromosome %>% group_by(CHROM) %>% filter(pi506069 != '0/0')
+pi329_filtered <- chromosome %>% group_by(CHROM) %>% filter(pi329311 != '0/0')  
+leoti_filtered <- chromosome %>% group_by(CHROM) %>% filter(leoti != '0/0')        
+pi229_filtered <- chromosome %>% group_by(CHROM) %>% filter(pi229841 != '0/0')
+pi297_filtered <- chromosome %>% group_by(CHROM) %>% filter(pi297155 != '0/0')    
+rio_filtered <- chromosome %>% group_by(CHROM) %>% filter(rio != '0/0')   
+```
+
+```{r}
+#This counts the numbers of features per 1M bp
+CA_filtered = CA_filtered %>% count(interval) %>% rename(CA = n)
+pi655_filtered = pi655_filtered %>% count(interval) %>% rename(pi655972 = n)
+pi510_filtered = pi510_filtered %>% count(interval) %>% rename(pi510757 = n)
+pi506_filtered = pi506_filtered %>% count(interval) %>% rename(pi506069 = n)
+pi329_filtered = pi329_filtered %>% count(interval) %>% rename(pi329311 = n)
+leoti_filtered = leoti_filtered %>% count(interval) %>% rename(leoti = n)
+pi229_filtered = pi229_filtered %>% count(interval) %>% rename(pi229841 = n)
+pi297_filtered = pi297_filtered %>% count(interval) %>% rename(pi297155 = n)
+rio_filtered = rio_filtered %>% count(interval)  %>% rename(rio = n)
+```
+
+```{r}
+merges <- full_join(CA_filtered, pi655_filtered, by = c("interval", "CHROM"))
+merges <- full_join(merges, pi510_filtered, by =  c("interval", "CHROM"))
+merges <- full_join(pi506_filtered, merges, by =  c("interval", "CHROM"))
+merges <- full_join(pi329_filtered, merges, by =  c("interval", "CHROM"))
+#merges <- full_join(pi300, merges, by = "interval") commented out because the grassl line (300119) is neither a sweet nor biomass variety
+merges <- full_join(leoti_filtered, merges, by =  c("interval", "CHROM"))
+merges <- full_join(pi229_filtered, merges, by =  c("interval", "CHROM"))
+merges <- full_join(pi297_filtered, merges, by =  c("interval", "CHROM"))
+merges <- full_join(rio_filtered, merges, by =  c("interval", "CHROM"))
+
+```
+
+```{r}
+#add averages for merged freqs for sweet variety and biomass variety, then make sure that strains with 0 features at a given column have 0 instead of NA:
+avg_Distance <- merges %>% mutate(sweetAVG = 0, cellulosicAVG = 0, 
+                            rio = ifelse(is.na(rio), 0, rio), pi297155 = ifelse(is.na(pi297155), 0, pi297155), pi229841 = ifelse(is.na(pi229841), 0, pi229841), leoti = ifelse(is.na(leoti), 0, leoti), pi329311 = ifelse(is.na(pi329311), 0, pi329311), pi506069 = ifelse(is.na(pi506069), 0, pi506069), 
+                            pi510757 = ifelse(is.na(pi510757), 0, pi510757), pi655972 = ifelse(is.na(pi655972), 0, pi655972), CA = ifelse(is.na(CA), 0, CA)) 
+
+#order the dataframe by interval
+avg_Distance <- avg_Distance[order(avg_Distance$interval),]
+
+avg_Distance$rio <- as.numeric(avg_Distance$rio)
+avg_Distance$pi297155 <- as.numeric(avg_Distance$pi297155)
+avg_Distance$pi229841 <- as.numeric(avg_Distance$pi229841)
+avg_Distance$leoti <- as.numeric(avg_Distance$leoti)
+avg_Distance$pi329311 <- as.numeric(avg_Distance$pi329311)
+avg_Distance$pi506069 <- as.numeric(avg_Distance$pi506069)
+avg_Distance$CA <- as.numeric(avg_Distance$CA)
+avg_Distance$pi655972 <- as.numeric(avg_Distance$pi655972)
+avg_Distance$pi510757 <- as.numeric(avg_Distance$pi510757)
+
+#Go through each row to find means for sweet and biomass
+for (row in 1:nrow(avg_Distance)) {
+  #add avg for Sweet sorghum
+  avg_Distance[row,"sweetAVG"] = round((avg_Distance[row,"rio"] + avg_Distance[row,"CA"] + avg_Distance[row,"leoti"])/3, 2)
+  #add avg for Biomass sorghum
+  avg_Distance[row,"cellulosicAVG"] = round((avg_Distance[row,"pi655972"] + avg_Distance[row,"pi510757"] + avg_Distance[row,"pi506069"] + avg_Distance[row,"pi329311"] + avg_Distance[row,"pi229841"] + avg_Distance[row,"pi297155"])/6, 2) 
+} 
+
+avg_Distance <- avg_Distance %>% mutate(distance = abs(sweetAVG - cellulosicAVG))
+top5Divergent <- avg_Distance[order(-avg_Distance$distance),][1:5,]
+```
+
+```{r}
+#Change line below to pull desired chromosome
+chrOfInterest <- avg_Distance %>% filter(CHROM == "Chr01")
+filteredChr <- chrOfInterest[,2:11]
+data_long <- melt(filteredChr, id = "interval")
+
+ggplot(data_long, aes(x = interval, y = value, color = variable)) + geom_line() +
+         ggtitle("Chromosome 01 Frequency of Duplications") + xlab("Interval (1M bp)") + ylab("Number of Features")
+
+```
+
+```{r}
+chrOfInterest <- chrOfInterest %>% mutate(predominantType = ifelse(sweetAVG > cellulosicAVG, "Sweet", "Cellulosic"))
+#Plots avg difference between sweet and biomass strains for each interval of given chromosome
+chrOfInterest %>% ggplot(aes(x=interval, y=distance, fill=predominantType)) + geom_col() + ggtitle("Chromosome 01 Average Difference in Number of Duplications") + xlab("Interval (1M bp)") + ylab("Average Difference (count)") + scale_fill_manual(values = c("#009E73", "#E69F00"))
+
+```
+
+#write out a csv of duplications per interval, and change name to appropriate chromosome
+```{r}
+write.csv(avg_Distance, "DuplicationsPerInterval_cons.csv")
+```
+
