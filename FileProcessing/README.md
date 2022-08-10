@@ -1,5 +1,5 @@
 # File Processing
-Nucmer was used to align 10 sorghum assemblies to identify structural variants with reference to the BTx623 reference genome, then SYRI was used to identify structural variants in these assemblies.  
+Nucmer was used to align 10 sorghum assemblies to identify structural variants with reference to the BTx623 reference genome, then SYRI was used to identify structural variants in these assemblies.  Line 300119 is excluded from further analyses since it is a wild sorghum line.
 1. I extracted specific variant types of interest (e.g. duplications) from each strain's vcf file using [AWK](DuplicationProc.slurm).
 2. I [formatted](DuplicationProcessing.py) this output and [marked](AddColumns.py) the occurence of each allele present.
 
