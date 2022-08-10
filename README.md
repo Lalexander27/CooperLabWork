@@ -7,4 +7,4 @@ I specifically compared patterns of duplications in sweet (sugar-accumulating) a
 4) I then [performed](DuplicationCounts/PermutationDuplications.Rmd) permutation testing to find intervals where sweet and biomass varieties had significantly different duplication counts.
 5) Next, I [annotated](GeneAnnotations/GenesInInterval.py) these significant intervals for gene location info, and marked associated GO terms and functions in arabidopsis and rice genomes.  
 6) I then performed GO term [enrichment analysis](GeneAnnotations/GOAnalyses.Rmd) to determine what GO terms and gene loci may be associated with divergences in duplication counts.
-7) After determining [gene loci](GeneLociVisualizations/SignGO.txt) that were associated with significantly enriched GO terms, I [visualized](Chr3Inv58_DuplGraph.png) the frequency of sweet and cellulosic duplications around these gene loci. 
+7) After determining [gene loci](GeneLociVisualizations/SignGO.txt) that were associated with significantly enriched GO terms, I [visualized](GeneLociVisualizations/Chr3Inv58_DuplGraph.png) the frequency of sweet and cellulosic duplications around these gene loci. 
