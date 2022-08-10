@@ -7,13 +7,6 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-#change access and/or change setwd for your computer
-access = "Louie"
-
-if(access =="Louie") {
-  setwd("C:\\Users\\louie\\Documents\\TestingDups\\PermTest")
-}
-
 ```
 
 ```{r}
@@ -36,7 +29,7 @@ library(reshape2)
 
 ```{r}
 #This is the ".vcf" file for Duplications that documents which strains a given duplication occurs in
-chromosome <- read.table("final_conserved_adj.vcf",header=TRUE,sep = '\t')
+chromosome <- read.table("duplicationsCounts_Example.vcf",header=TRUE,sep = '\t')
 ```
 
 ```{r} 
@@ -75,7 +68,6 @@ merges <- full_join(CA_filtered, pi655_filtered, by = c("interval", "CHROM"))
 merges <- full_join(merges, pi510_filtered, by =  c("interval", "CHROM"))
 merges <- full_join(pi506_filtered, merges, by =  c("interval", "CHROM"))
 merges <- full_join(pi329_filtered, merges, by =  c("interval", "CHROM"))
-#merges <- full_join(pi300, merges, by = "interval") commented out because the grassl line (300119) is neither a sweet nor biomass variety
 merges <- full_join(leoti_filtered, merges, by =  c("interval", "CHROM"))
 merges <- full_join(pi229_filtered, merges, by =  c("interval", "CHROM"))
 merges <- full_join(pi297_filtered, merges, by =  c("interval", "CHROM"))
@@ -106,7 +98,7 @@ avg_Distance$pi510757 <- as.numeric(avg_Distance$pi510757)
 for (row in 1:nrow(avg_Distance)) {
   #add avg for Sweet sorghum
   avg_Distance[row,"sweetAVG"] = round((avg_Distance[row,"rio"] + avg_Distance[row,"CA"] + avg_Distance[row,"leoti"])/3, 2)
-  #add avg for Biomass sorghum
+  #add avg for Cellulosic sorghum
   avg_Distance[row,"cellulosicAVG"] = round((avg_Distance[row,"pi655972"] + avg_Distance[row,"pi510757"] + avg_Distance[row,"pi506069"] + avg_Distance[row,"pi329311"] + avg_Distance[row,"pi229841"] + avg_Distance[row,"pi297155"])/6, 2) 
 } 
 
