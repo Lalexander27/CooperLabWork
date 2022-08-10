@@ -7,10 +7,6 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-access = "Louie"
-if(access =="Louie") {
-  setwd("C:\\Users\\louie\\Desktop\\ResearchFiles\\RPlotting\\CircosPlotsFiles")
-}
 
 if (!require(readxl)) {
   install.packages("readxl")
