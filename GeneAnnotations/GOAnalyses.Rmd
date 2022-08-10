@@ -7,14 +7,6 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-
-#change access and/or change setwd for your computer
-access = "Louie"
-
-if(access =="Louie") {
-  setwd("C:\\Users\\louie\\Desktop\\ResearchFiles\\RPlotting\\PermutationTesting")
-}
-
 ```
 
 ```{r}
