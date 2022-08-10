@@ -52,15 +52,15 @@ rio_filtered <- chromosome %>% group_by(CHROM) %>% filter(rio != '0/0')
 
 ```{r}
 #This counts the numbers of features per 1M bp
-CA_filtered = CA_filtered %>% count(interval) %>% rename(CA = n)
-pi655_filtered = pi655_filtered %>% count(interval) %>% rename(pi655972 = n)
-pi510_filtered = pi510_filtered %>% count(interval) %>% rename(pi510757 = n)
-pi506_filtered = pi506_filtered %>% count(interval) %>% rename(pi506069 = n)
-pi329_filtered = pi329_filtered %>% count(interval) %>% rename(pi329311 = n)
-leoti_filtered = leoti_filtered %>% count(interval) %>% rename(leoti = n)
-pi229_filtered = pi229_filtered %>% count(interval) %>% rename(pi229841 = n)
-pi297_filtered = pi297_filtered %>% count(interval) %>% rename(pi297155 = n)
-rio_filtered = rio_filtered %>% count(interval)  %>% rename(rio = n)
+CA_filtered = CA_filtered %>% count(interval)
+pi655_filtered = pi655_filtered %>% count(interval)
+pi510_filtered = pi510_filtered %>% count(interval)
+pi506_filtered = pi506_filtered %>% count(interval)
+pi329_filtered = pi329_filtered %>% count(interval)
+leoti_filtered = leoti_filtered %>% count(interval)
+pi229_filtered = pi229_filtered %>% count(interval)
+pi297_filtered = pi297_filtered %>% count(interval)
+rio_filtered = rio_filtered %>% count(interval)
 ```
 
 ```{r}
