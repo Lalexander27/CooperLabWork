@@ -38,7 +38,7 @@ names <- names(GOTerms)
 
 ```{r}
 #This is your input of genes of interest
-SignIntervals <- read.table("GODupl.txt", sep = "\t", header = TRUE) 
+SignIntervals <- read.table("GenesInInterval.tsv", sep = "\t", header = TRUE) 
 
 #This pulls the gene IDs and puts them in a list
 list <- SignIntervals$Transcript.ID
