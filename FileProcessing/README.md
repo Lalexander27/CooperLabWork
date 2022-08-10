@@ -4,7 +4,7 @@ Nucmer was used to align 10 sorghum assemblies to identify structural variants w
 2. I [formatted](DuplicationProcessing.py) this output and [marked](AddColumns.py) the occurence of each allele present.
 
 **Given the large number of duplications present in the nucmer-SYRI outputs, we decided to test the more conservative minimap aligner, then perform SYRI and filter duplications**  
-3. I filtered duplications from the minimap-SYRI output as described in (1) above 
+3. I filtered duplications from the minimap-SYRI output as described in (1) above
 4. Then, I [filtered](DupSyri.py) the minimap-SYRI results and nucmer-SYRI results for duplications that were conserved in both files (i.e. duplications with aligned to similar positions on the reference genome, which originated from the same chromosome and similar position of the query assembly.)  
 5. Then I merged all formatted files to create a master file of allele occurence across these genomes using [bcftools](ProcessingConservedDuplications.sh).
 
