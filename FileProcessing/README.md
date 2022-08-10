@@ -10,4 +10,4 @@ Nucmer was used to align 10 sorghum assemblies to identify structural variants w
 
 - Slurm files show this process and output the final merged file.  This [file](ExampleSyriOutput.vcf) can be used as an input for the slurm file.
 - Some duplication features in the nucmer-SYRI output had a lot of overlap, with similar start/end positions.  These were processed out using DuplicationProcessing.py and the non-overlapping features were analyzed further.
-- Inversions and translocations can be [processed](CooperLabWork/FileProcessing/OtherVariants) with slurm files and AddColumns.py.
+- Inversions and translocations can be [processed](/OtherVariants) with slurm files and AddColumns.py.
