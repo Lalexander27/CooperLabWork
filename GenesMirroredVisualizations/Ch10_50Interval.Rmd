@@ -36,7 +36,7 @@ duplications <- read.table("final_conserved_adj.vcf",header=TRUE,sep = '\t')
 ```{r}
 chromosome <- duplications %>% filter(CHROM == "Chr10") %>% dplyr::select( -c(ID, FORMAT, REF, ALT, QUAL, FILTER, INFO))
 
-#This splits the chromosome into "steps" of 1k bp in size
+#This splits the chromosome into "steps" of 10k bp in size
 chromosome$interval <- floor(chromosome$POS/10000)
 chromosome <- chromosome %>% filter(POS >= 50000000 & POS <= 51000000) %>% select(-c(CHROM, POS))
 ```
