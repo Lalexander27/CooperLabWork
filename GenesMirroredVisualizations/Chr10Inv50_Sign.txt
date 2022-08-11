@@ -1,0 +1,3 @@
+Chromosome	Feature	Start	End	Gene ID	Pac ID	Transcript ID	GO	Arabidopsis Gene	Arabi. Symbol	Arabi. Description	Rice Gene	Rice Symbol	Rice Description
+Chr10	gene	50836164	50840275	Sobic.010G173100	37910451	Sobic.010G173100.1	"GO:0005515,GO:0006414,GO:0003746"	AT1G09640.1	-	"Translation elongation factor EF1B, gamma chain"	LOC_Os06g37440.1	-	"elongation factor 1-gamma, putative, expressed"
+Chr10	gene	50881171	50883589	Sobic.010G173600	37911386	Sobic.010G173600.1	"GO:0055114,GO:0050660,GO:0016491,GO:0019139,GO:0009690"	AT5G56970.1	"ATCKX3,CKX3"	cytokinin oxidase 3	LOC_Os06g37500.1	-	"cytokinin dehydrogenase precursor, putative, expressed"
