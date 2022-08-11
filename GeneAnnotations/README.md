@@ -1,4 +1,4 @@
 # Gene Annotations & GO Analyses
-1) For each [significant interval](SignificantIntervals.csv), I [extracted](GenesInInterval.py) sorghum genes from a [gff file](Sbicolor_454_Chr03_gene.gff3) and matched gene ids to [annotation information](Sbicolor_454_v3_1_1_annotation_info.txt) (Gene Ontology (GO) terms and similar genes in arabidopsis and rice.)
+1) For each [significant interval](SignificantIntervals.csv), I [extracted](GenesInInterval.py) sorghum genes from a [gff file](Sbicolor_454_Chr03_gene.gff3) and matched gene ids to [annotation information](Sbicolor_454_v3_1_1_annotation_info.txt) (Gene Ontology (GO) terms and similar genes in arabidopsis and rice.) [Note that the gff file here only incudes information for chromosome 3.]
 2) Then I performed Biological Process (BP) [GO enrichment analyses](GOAnalyses.Rmd) for the [gene ids](GODupl.txt) in these intervals.  For these analyses, a [list](gene_to_GO.txt) was compiled for all sorghum gene ids and associated GO terms.
 3) After GO enrichment analyses, the most significant GO terms were identified and these significant GO terms were plotted in a [directed graph](GO_BP.png)
